@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">📋 AI Student Insight Report</h2>
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <div class="card shadow-lg mb-4">
+            <div class="card-body">
+
+                <h4>👤 Student Information</h4>
+                <hr>
+
+                <p><strong>Name:</strong> {{ student.name }}</p>
+                <p><strong>Department:</strong> {{ student.department }}</p>
+                <p><strong>Year:</strong> {{ student.year }}</p>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="card shadow-lg mb-4">
+            <div class="card-body">
+
+                <h4>📊 Attendance</h4>
+                <hr>
+
+                <h2>{{ student.attendance }}%</h2>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow-lg mb-4">
+
+    <div class="card-body">
+
+        <h4>📚 Academic Performance</h4>
+
+        <table class="table">
+
+            <tr>
+                <th>Math</th>
+                <td>{{ student.math_marks }}</td>
+            </tr>
+
+            <tr>
+                <th>Science</th>
+                <td>{{ student.science_marks }}</td>
+            </tr>
+
+            <tr>
+                <th>English</th>
+                <td>{{ student.english_marks }}</td>
+            </tr>
+
+            <tr class="table-primary">
+                <th>Average</th>
+                <td>{{ report.average }}</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="card shadow-lg mb-4">
+
+    <div class="card-body">
+
+        <h4>🤖 AI Analysis</h4>
+
+        <hr>
+
+        <h5>
+
+            Risk Level:
+
+            {% if report.risk == "High" %}
+
+            <span class="badge bg-danger">High</span>
+
+            {% elif report.risk == "Medium" %}
+
+            <span class="badge bg-warning text-dark">Medium</span>
+
+            {% else %}
+
+            <span class="badge bg-success">Low</span>
+
+            {% endif %}
+
+        </h5>
+
+        <br>
+
+        <h5>Recommendation</h5>
+
+        <p>{{ report.recommendation }}</p>
+
+    </div>
+
+</div>
+
+<a href="/students" class="btn btn-primary">
+    ← Back to Students
+</a>
+
+{% endblock %}

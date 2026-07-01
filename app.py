@@ -1,9 +1,10 @@
 from utils.charts import create_risk_chart
 from ai.risk_engine import analyze_student
 from models import db, Student
-from flask import Flask, render_template, request, redirect, url_for
-
+from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
+app.secret_key = "edupath-secret-key"
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -21,19 +22,42 @@ def login():
 
     if request.method == "POST":
 
+        role = request.form["role"]
         username = request.form["username"]
         password = request.form["password"]
 
-        if username == TEACHER_USERNAME and password == TEACHER_PASSWORD:
-            return redirect(url_for("teacher_dashboard"))
+        if role == "teacher":
 
-        return "Invalid Username or Password"
+            if username == TEACHER_USERNAME and password == TEACHER_PASSWORD:
+
+                session.clear()
+                session["teacher"] = True
+
+                return redirect(url_for("teacher_dashboard"))
+
+        elif role == "student":
+
+            student = Student.query.filter_by(
+                roll_number=username,
+                password=password
+            ).first()
+
+            if student:
+
+                session.clear()
+                session["student_id"] = student.id
+
+                return redirect(url_for("student_dashboard"))
+
+        return "Invalid Login Credentials"
 
     return render_template("login.html")
 
 
 @app.route("/teacher")
 def teacher_dashboard():
+    if "teacher" not in session:
+        return redirect(url_for("login"))
 
     students = Student.query.all()
 
@@ -91,7 +115,9 @@ def teacher_dashboard():
     )
 @app.route("/add-student", methods=["GET", "POST"])
 def add_student():
-
+    if "teacher" not in session:
+        return redirect(url_for("login"))
+ 
     if request.method == "POST":
  
         name = request.form["name"]
@@ -110,6 +136,8 @@ def add_student():
             name=name,
             department=department,
             year=year,
+            roll_number = request.form["roll_number"],
+            password = request.form["password"],
             attendance=attendance,
             math_marks=math_marks,
             science_marks=science_marks,
@@ -126,7 +154,9 @@ def add_student():
     return render_template("add_student.html")
 @app.route("/students")
 def students():
-
+    if "teacher" not in session:
+        return redirect(url_for("login"))
+   
     students = Student.query.all()
 
     student_reports = []
@@ -143,6 +173,84 @@ def students():
         "students.html",
         student_reports=student_reports
     )
+@app.route("/edit-student/<int:id>", methods=["GET", "POST"])
+def edit_student(id):
+    if "teacher" not in session:
+         return redirect(url_for("login"))
+  
+    student = Student.query.get_or_404(id)
 
+    if request.method == "POST":
+
+        student.name = request.form["name"]
+        student.department = request.form["department"]
+        student.year = int(request.form["year"])
+
+        db.session.commit()
+
+        return redirect(url_for("students"))
+
+    return render_template(
+        "edit_student.html",
+        student=student
+    )
+@app.route("/delete-student/<int:id>")
+def delete_student(id):
+
+    if "teacher" not in session:
+        return redirect(url_for("login"))
+
+    student = Student.query.get_or_404(id)
+
+    db.session.delete(student)
+    db.session.commit()
+
+    return redirect(url_for("students"))
+@app.route("/student-report/<int:id>")
+def student_report(id):
+    if "teacher" not in session:
+        return redirect(url_for("login"))
+ 
+    student = Student.query.get_or_404(id)
+
+    report = analyze_student(student)
+
+    return render_template(
+        "student_report.html",
+        student=student,
+        report=report
+    )
+
+@app.route("/student-dashboard")
+def student_dashboard():
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
+
+    student = Student.query.get(session["student_id"])
+
+    report = analyze_student(student)
+
+    if report["risk"] == "Low":
+        message = "Excellent work! Keep maintaining your performance."
+
+    elif report["risk"] == "Medium":
+        message = "You're doing well. A little more effort can make a big difference."
+
+    else:
+        message = "Don't worry. Every improvement starts with one step. Follow the recommendations and keep going!"
+
+    return render_template(
+        "student_dashboard.html",
+        student=student,
+        report=report,
+        message=message
+    )
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(url_for("login"))
 if __name__ == "__main__":
     app.run(debug=True)

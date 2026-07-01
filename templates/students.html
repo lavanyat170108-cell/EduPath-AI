@@ -38,6 +38,7 @@
             <th>Average</th>
             <th>Risk</th>
             <th>Recommendation</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -76,6 +77,18 @@
             </td>
 
             <td>{{ item.report.recommendation }}</td>
+            <td>
+                <a href="/edit-student/{{ item.student.id }}" class="btn btn-warning btn-sm">
+                    ✏️ Edit
+                </a>
+                <a href="/delete-student/{{ item.student.id }}" class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure you want to delete this student?')">
+                    🗑 Delete
+                </a>
+                <a href="/student-report/{{ item.student.id }}" class="btn btn-info btn-sm">
+                    📋 Report
+                </a>
+            </td>
 
         </tr>
 

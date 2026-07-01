@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    🎓 Welcome, {{ student.name }}
+</h2>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card shadow p-3 mb-3">
+            <h5>Roll Number</h5>
+            <h3>{{ student.roll_number }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow p-3 mb-3">
+            <h5>Attendance</h5>
+            <h3>{{ student.attendance }}%</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow p-3 mb-3">
+            <h5>Average Marks</h5>
+            <h3>{{ report.average }}</h3>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card shadow p-3">
+
+            <h5>Risk Level</h5>
+
+            {% if report.risk == "High" %}
+            <span class="badge bg-danger fs-5">High</span>
+
+            {% elif report.risk == "Medium" %}
+            <span class="badge bg-warning text-dark fs-5">Medium</span>
+
+            {% else %}
+            <span class="badge bg-success fs-5">Low</span>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+<div class="card shadow p-4 mt-4">
+
+    <h4>🤖 AI Recommendation</h4>
+
+    <p>{{ report.recommendation }}</p>
+
+</div>
+
+<div class="alert alert-info mt-4">
+
+    <h5>💡 AI Motivation</h5>
+
+    <p>{{ message }}</p>
+
+</div>
+
+{% endblock %}
