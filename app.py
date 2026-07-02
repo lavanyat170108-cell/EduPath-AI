@@ -1,7 +1,7 @@
 from utils.charts import create_risk_chart
 from ai.risk_engine import analyze_student
 from models import db, Student
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 app = Flask(__name__)
 app.secret_key = "edupath-secret-key"
 
@@ -29,11 +29,16 @@ def login():
         if role == "teacher":
 
             if username == TEACHER_USERNAME and password == TEACHER_PASSWORD:
-
+                
                 session.clear()
                 session["teacher"] = True
+                
+                flash("Logged in successfully!", "success")
 
                 return redirect(url_for("teacher_dashboard"))
+            flash("Invalid Teacher Credentials.", "danger")
+
+            return redirect(url_for("login"))
 
         elif role == "student":
 
@@ -46,10 +51,12 @@ def login():
 
                 session.clear()
                 session["student_id"] = student.id
-
+                flash("Welcome back!", "success")
                 return redirect(url_for("student_dashboard"))
 
-        return "Invalid Login Credentials"
+            flash("Invalid username, password, or role.", "danger")
+
+            return redirect(url_for("login"))
 
     return render_template("login.html")
 
@@ -154,10 +161,29 @@ def add_student():
     return render_template("add_student.html")
 @app.route("/students")
 def students():
+
     if "teacher" not in session:
         return redirect(url_for("login"))
-   
-    students = Student.query.all()
+
+    search = request.args.get("search", "")
+    department = request.args.get("department", "")
+    year = request.args.get("year", "")
+
+    query = Student.query
+
+    if search:
+        query = query.filter(
+            (Student.name.contains(search)) |
+            (Student.roll_number.contains(search))
+        )
+
+    if department:
+        query = query.filter_by(department=department)
+
+    if year:
+        query = query.filter_by(year=int(year))
+
+    students = query.all()
 
     student_reports = []
 
@@ -171,7 +197,10 @@ def students():
 
     return render_template(
         "students.html",
-        student_reports=student_reports
+        student_reports=student_reports,
+        search=search,
+        department=department,
+        year=year
     )
 @app.route("/edit-student/<int:id>", methods=["GET", "POST"])
 def edit_student(id):
@@ -187,6 +216,8 @@ def edit_student(id):
         student.year = int(request.form["year"])
 
         db.session.commit()
+
+        flash("Student updated successfully!", "success")
 
         return redirect(url_for("students"))
 
@@ -204,6 +235,8 @@ def delete_student(id):
 
     db.session.delete(student)
     db.session.commit()
+
+    flash("Student deleted successfully!", "success")
 
     return redirect(url_for("students"))
 @app.route("/student-report/<int:id>")
@@ -250,6 +283,8 @@ def student_dashboard():
 def logout():
 
     session.clear()
+
+    flash("Logged out successfully.", "info")
 
     return redirect(url_for("login"))
 if __name__ == "__main__":

@@ -64,33 +64,84 @@
 
         <div class="container">
 
+            {% if session.get("teacher") %}
+
             <a class="navbar-brand" href="/teacher">
-                🎓 EduPath AI
-            </a>
 
-            <div class="d-flex">
+                {% elif session.get("student_id") %}
 
-                <a href="/teacher" class="btn btn-light btn-sm">
-                    🏠 Dashboard
+                <a class="navbar-brand" href="/student-dashboard">
+
+                    {% else %}
+
+                    <a class="navbar-brand" href="/">
+
+                        {% endif %}
+
+                        🎓 EduPath AI
+
+                    </a>
                 </a>
 
-                <a href="/students" class="btn btn-outline-light btn-sm">
-                    👨‍🎓 Students
-                </a>
+                <div class="d-flex">
 
-                <a href="/add-student" class="btn btn-success btn-sm">
-                    ➕ Add Student
-                </a>
-                <a href="/logout" class="btn btn-danger btn-sm">
-                    🚪 Logout
-                </a>
-            </div>
+                    {% if session.get("teacher") %}
+
+                    <a href="/teacher" class="btn btn-light btn-sm">
+                        🏠 Dashboard
+                    </a>
+
+                    <a href="/students" class="btn btn-outline-light btn-sm">
+                        👨‍🎓 Students
+                    </a>
+
+                    <a href="/add-student" class="btn btn-success btn-sm">
+                        ➕ Add Student
+                    </a>
+
+                    {% elif session.get("student_id") %}
+
+                    <a href="/student-dashboard" class="btn btn-light btn-sm">
+                        🏠 My Dashboard
+                    </a>
+
+                    {% endif %}
+
+                    {% if session.get("teacher") or session.get("student_id") %}
+
+                    <a href="/logout" class="btn btn-danger btn-sm ms-2">
+                        🚪 Logout
+                    </a>
+
+                    {% endif %}
+
+                </div>
 
         </div>
 
     </nav>
 
     <div class="container mt-4">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+        {% for category, message in messages %}
+
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+
+            {{ message }}
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+        </div>
+
+        {% endfor %}
+
+        {% endif %}
+
+        {% endwith %}
 
         {% block content %}
 
@@ -102,9 +153,9 @@
 
         <p class="mb-1"><strong>EduPath AI</strong></p>
         <p class="mb-0">AI-powered Student Risk Analysis System</p>
-        <small>© 2026 Lavanya Thiyagarajan</small>
-
+        <small>Version 1.0 (POC) • © 2026 Lavanya Thiyagarajan</small>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

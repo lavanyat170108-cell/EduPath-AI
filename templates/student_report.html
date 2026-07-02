@@ -2,51 +2,50 @@
 
 {% block content %}
 
-<h2 class="mb-4">📋 AI Student Insight Report</h2>
+<div class="card shadow">
 
-<div class="row">
-
-    <div class="col-md-6">
-
-        <div class="card shadow-lg mb-4">
-            <div class="card-body">
-
-                <h4>👤 Student Information</h4>
-                <hr>
-
-                <p><strong>Name:</strong> {{ student.name }}</p>
-                <p><strong>Department:</strong> {{ student.department }}</p>
-                <p><strong>Year:</strong> {{ student.year }}</p>
-
-            </div>
-        </div>
-
+    <div class="card-header bg-primary text-white">
+        <h3>📋 AI Student Report</h3>
     </div>
-
-    <div class="col-md-6">
-
-        <div class="card shadow-lg mb-4">
-            <div class="card-body">
-
-                <h4>📊 Attendance</h4>
-                <hr>
-
-                <h2>{{ student.attendance }}%</h2>
-
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<div class="card shadow-lg mb-4">
 
     <div class="card-body">
 
-        <h4>📚 Academic Performance</h4>
+        <h4 class="mb-3">👤 Student Information</h4>
 
-        <table class="table">
+        <table class="table table-bordered">
+
+            <tr>
+                <th>Name</th>
+                <td>{{ student.name }}</td>
+            </tr>
+
+            <tr>
+                <th>Roll Number</th>
+                <td>{{ student.roll_number }}</td>
+            </tr>
+
+            <tr>
+                <th>Department</th>
+                <td>{{ student.department }}</td>
+            </tr>
+
+            <tr>
+                <th>Year</th>
+                <td>{{ student.year }}</td>
+            </tr>
+
+        </table>
+
+        <hr>
+
+        <h4 class="mb-3">📊 Academic Performance</h4>
+
+        <table class="table table-striped">
+
+            <tr>
+                <th>Attendance</th>
+                <td>{{ student.attendance }}%</td>
+            </tr>
 
             <tr>
                 <th>Math</th>
@@ -70,50 +69,90 @@
 
         </table>
 
-    </div>
-
-</div>
-
-<div class="card shadow-lg mb-4">
-
-    <div class="card-body">
-
-        <h4>🤖 AI Analysis</h4>
-
         <hr>
 
-        <h5>
+        <h4 class="mb-3">🤖 AI Analysis</h4>
 
-            Risk Level:
+        <p>
+
+            <strong>Risk Level:</strong>
 
             {% if report.risk == "High" %}
-
-            <span class="badge bg-danger">High</span>
+            <span class="badge bg-danger fs-6">High</span>
 
             {% elif report.risk == "Medium" %}
-
-            <span class="badge bg-warning text-dark">Medium</span>
+            <span class="badge bg-warning text-dark fs-6">Medium</span>
 
             {% else %}
-
-            <span class="badge bg-success">Low</span>
+            <span class="badge bg-success fs-6">Low</span>
 
             {% endif %}
 
-        </h5>
+        </p>
 
-        <br>
+        <div class="alert alert-info">
 
-        <h5>Recommendation</h5>
+            <strong>Recommendation</strong>
 
-        <p>{{ report.recommendation }}</p>
+            <br><br>
+
+            {{ report.recommendation }}
+
+        </div>
+
+        <div class="alert alert-success">
+
+            <strong>AI Academic Summary</strong>
+
+            <br><br>
+
+            {% if report.risk == "Low" %}
+
+            The student is performing consistently well with strong academic results and good attendance. Continue
+            maintaining current study habits and explore advanced learning opportunities.
+
+            {% elif report.risk == "Medium" %}
+
+            The student shows satisfactory performance but has room for improvement. Increasing attendance and
+            strengthening weaker subjects can significantly improve academic outcomes.
+
+            {% else %}
+
+            The student is currently at academic risk. Immediate support, regular mentoring, improved attendance, and
+            additional practice are recommended to improve overall performance.
+
+            {% endif %}
+
+        </div>
+
+        <div class="alert alert-warning">
+
+            <strong>💬 Motivation</strong>
+
+            <br><br>
+
+            {% if report.risk == "Low" %}
+
+            Great job! Keep learning, stay curious, and continue inspiring others with your consistency.
+
+            {% elif report.risk == "Medium" %}
+
+            Small improvements every day lead to big achievements. Stay focused—you can do it!
+
+            {% else %}
+
+            Every successful student has faced challenges. Keep believing in yourself and take one step at a time.
+
+            {% endif %}
+
+        </div>
+
+        <a href="/students" class="btn btn-secondary">
+            ⬅ Back to Students
+        </a>
 
     </div>
 
 </div>
-
-<a href="/students" class="btn btn-primary">
-    ← Back to Students
-</a>
 
 {% endblock %}
